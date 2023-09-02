@@ -1,4 +1,6 @@
-﻿namespace Server.ItSelf
+﻿using System.Net;
+
+namespace Server.ItSelf
 {
     internal record Request(string Path, HttpMethod Method);
 
@@ -18,6 +20,17 @@
             
         }
     }
+
+    internal static class ResponseWriter
+    {
+        public static void WriteStatus(HttpStatusCode code, Stream stream)
+        {
+            using var writer = new StreamWriter(stream, leaveOpen: true);
+            writer.WriteLine($"HTTP/1.0 {(int)code} {code}");
+            writer.WriteLine();
+        }
+    }
+
     public class StaticFileHandler : IHandler
     {
         private readonly string _path;
@@ -40,9 +53,11 @@
                 if (!File.Exists(filePath))
                 {
                     //TODO: write 404
+                    ResponseWriter.WriteStatus(HttpStatusCode.NotFound, networkStream);
                 }
                 else
                 {
+                    ResponseWriter.WriteStatus(HttpStatusCode.OK, networkStream);
                     using (var fileStream = File.OpenRead(filePath))
                     {
                         fileStream.CopyTo(networkStream);
