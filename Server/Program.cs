@@ -6,7 +6,7 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            ServerHost host = new ServerHost();
+            ServerHost host = new ServerHost(new StaticFileHandler(Path.Combine(Environment.CurrentDirectory, "www")));
             host.Start();
         }
     }
