@@ -7,7 +7,7 @@ namespace Server
         static void Main(string[] args)
         {
             ServerHost host = new ServerHost(new ControllersHandler(typeof(Program).Assembly));
-            host.Start();
+            host.StartV2();
         }
     }
 }
