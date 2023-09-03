@@ -2,11 +2,11 @@
 
 namespace Server
 {
-    class Programm
+    class Program
     {
         static void Main(string[] args)
         {
-            ServerHost host = new ServerHost(new StaticFileHandler(Path.Combine(Environment.CurrentDirectory, "www")));
+            ServerHost host = new ServerHost(new ControllersHandler(typeof(Program).Assembly));
             host.Start();
         }
     }
