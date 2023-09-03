@@ -21,16 +21,24 @@ namespace Server.ItSelf
 
             while (true)
             {
-                using (var client = listener.AcceptTcpClient())
-                using (var stream = client.GetStream())
-                using (var reader = new StreamReader(stream))
+                try
                 {
-                    var firstLine = reader.ReadLine();
-                    for (string line = null; line != string.Empty; line = reader.ReadLine()) ;
+                    using (var client = listener.AcceptTcpClient())
+                    using (var stream = client.GetStream())
+                    using (var reader = new StreamReader(stream))
+                    {
+                        var firstLine = reader.ReadLine();
+                        for (string line = null; line != string.Empty; line = reader.ReadLine()) ;
 
-                    var request = RequestParser.Parse(firstLine);
-                    _handler.Handle(stream, request);
+                        var request = RequestParser.Parse(firstLine);
+                        _handler.Handle(stream, request);
+                    }
                 }
+                catch (Exception ex)
+                {
+
+                    Console.WriteLine(ex);
+                }                
             }
         }
 
@@ -47,21 +55,64 @@ namespace Server.ItSelf
             }
         }
 
+        public async Task StartAsync()
+        {
+            Console.WriteLine("Server Started Async");
+            TcpListener listener = new TcpListener(IPAddress.Any, 80);
+            listener.Start();
+
+            while (true)
+            {
+                try
+                {
+                    var client = await listener.AcceptTcpClientAsync();
+                    await ProcessClientAsync(client);
+                }
+                catch (Exception ex)
+                {
+
+                    Console.WriteLine(ex);
+                }                
+            }
+        }
+
         private void ProcessClient(TcpClient client)
         {
             ThreadPool.QueueUserWorkItem(o =>
             {
+                try
+                {
+                    using (client)
+                    using (var stream = client.GetStream())
+                    using (var reader = new StreamReader(stream))
+                    {
+                        var firstLine = reader.ReadLine();
+                        for (string line = null; line != string.Empty; line = reader.ReadLine()) ;
+
+                        var request = RequestParser.Parse(firstLine);
+                        _handler.Handle(stream, request);
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    Console.WriteLine(ex);
+                }                
+            });            
+        }
+
+        private async Task ProcessClientAsync(TcpClient client)
+        {            
                 using (client)
                 using (var stream = client.GetStream())
                 using (var reader = new StreamReader(stream))
                 {
-                    var firstLine = reader.ReadLine();
-                    for (string line = null; line != string.Empty; line = reader.ReadLine()) ;
+                    var firstLine = await reader.ReadLineAsync();
+                    for (string line = null; line != string.Empty; line = await reader.ReadLineAsync()) ;
 
                     var request = RequestParser.Parse(firstLine);
-                    _handler.Handle(stream, request);
-                }
-            });            
+                    await _handler.HandleAsync(stream, request);
+                }            
         }
     }
 }
