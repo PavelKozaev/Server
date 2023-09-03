@@ -12,6 +12,7 @@ namespace Server.Controllers
     {
         public User[] Index()
         {
+            Thread.Sleep(5);
             return new[]
             {
                 new User("Pavel", "Kozaev", "North"),
