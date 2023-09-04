@@ -62,17 +62,9 @@ namespace Server.ItSelf
             listener.Start();
 
             while (true)
-            {
-                try
-                {
+            {                
                     var client = await listener.AcceptTcpClientAsync();
-                    await ProcessClientAsync(client);
-                }
-                catch (Exception ex)
-                {
-
-                    Console.WriteLine(ex);
-                }                
+                    var _ = ProcessClientAsync(client);                         
             }
         }
 
@@ -102,7 +94,9 @@ namespace Server.ItSelf
         }
 
         private async Task ProcessClientAsync(TcpClient client)
-        {            
+        {
+            try
+            {
                 using (client)
                 using (var stream = client.GetStream())
                 using (var reader = new StreamReader(stream))
@@ -112,7 +106,14 @@ namespace Server.ItSelf
 
                     var request = RequestParser.Parse(firstLine);
                     await _handler.HandleAsync(stream, request);
-                }            
+                }
+            }
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex);
+            }
+                  
         }
     }
 }
