@@ -11,16 +11,4 @@
     <ProjectReference Include="..\Server.ItSelf\Server.ItSelf.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="www\Index.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="www\peakpx.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="www\png-transparent-butterfly-pink-free-butterflies-pics-purple-blue-image-file-formats-thumbnail.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
