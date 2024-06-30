@@ -1,6 +1,6 @@
 ﻿using System.Net.Sockets;
 using System.Net;
-using System.Reflection.PortableExecutable;
+using Newtonsoft.Json;
 
 namespace Server.ItSelf
 {
@@ -62,9 +62,10 @@ namespace Server.ItSelf
             listener.Start();
 
             while (true)
-            {                
-                    var client = await listener.AcceptTcpClientAsync();
-                    var _ = ProcessClientAsync(client);                         
+            {
+                var client = await listener.AcceptTcpClientAsync();
+                Console.WriteLine("Client connected");
+                var _ = ProcessClientAsync(client);
             }
         }
 
@@ -102,18 +103,18 @@ namespace Server.ItSelf
                 using (var reader = new StreamReader(stream))
                 {
                     var firstLine = await reader.ReadLineAsync();
+                    Console.WriteLine($"Request: {firstLine}");
                     for (string line = null; line != string.Empty; line = await reader.ReadLineAsync()) ;
 
                     var request = RequestParser.Parse(firstLine);
+                    Console.WriteLine($"Parsed request: {JsonConvert.SerializeObject(request)}");
                     await _handler.HandleAsync(stream, request);
                 }
             }
             catch (Exception ex)
             {
-
                 Console.WriteLine(ex);
             }
-                  
         }
     }
 }
